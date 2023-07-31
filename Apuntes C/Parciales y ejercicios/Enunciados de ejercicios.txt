@@ -1,0 +1,29 @@
+1-Realizar una función que reciba un puntero a char y dos char.
+La función deberá reemplazar en la cadena cada ocurrencia del primer carácter recibido,
+por el segundo. Retornando la cantidad de reemplazos o -1 en caso de error.
+
+2-Realizar una función que reciba como parámetros un array de enteros y un entero por referencia.
+La función calculará el valor máximo de ese array y utilizará el valor por referencia para retornar ese valor.
+
+3-Dada la siguiente estructura: int legajo; char nombre[20]; int edad; 
+Realizar una función que cargue un array de 3 estudiantes. 
+Recibe un entero. Retorna el estudiante dado de alta y por parámetro 0 si funcionó correctamente -1 mal. 
+Una vez devuelto el estudiante cargarlo en una posición del array. Al final mostrar el array cargado
+
+4-Dada la siguiente estructura: int legajo; char nombre[20]; int edad;
+Realizar una función que cargue un array de 3 estudiantes. 
+Recibe un puntero al array de estudiantes, lo carga y retorna 0 si funcionó correctamente -1 mal.
+Una vez cargados los estudiantes mostrar el array cargado.
+
+Ejercicio 15-1:
+Realizar el ordenamiento de un vector de enteros. 
+Para ello deberán crear una función que se encargue de realizar el intercambio 
+de los dos valores que se van a ordenar (función swap), que solo puede recibir dos parámetros.
+
+Ejercicio 15-2:
+Realizar una función que reciba como parámetro un puntero a entero. 
+La función le pedirá al usuario que cargue un valor por medio del puntero. 
+Retornará si pudo cargarlo o no.
+
+
+

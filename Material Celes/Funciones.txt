@@ -1,0 +1,791 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "Biblioteca.h"
+#include <string.h>
+#include <ctype.h>
+//*************************************************************
+int scanString (char ingreso[],int tam)/*toma datos*/
+{
+    int retorno=0;
+    char auxiliar[4500];
+
+    if(ingreso!=NULL&&tam>0)
+    {
+        fflush(stdin);
+
+        if((fgets(auxiliar,sizeof(auxiliar),stdin)!=NULL))
+        {
+            if(auxiliar[strlen(auxiliar)-1]=='\n')
+            {
+                 auxiliar[strlen(auxiliar)-1]='\0';
+            }
+            if(strlen(auxiliar)<=tam)
+            {
+                strncpy(ingreso,auxiliar,tam);
+                retorno=1;
+            }
+        }
+
+    }
+   return retorno;
+}
+int utn_getTelefono(char* msg, char* msgError, int minSize, int maxSize, int min, int max, int reintentos, char* input)
+{
+    int retorno=-1;
+    char bufferStr[maxSize];
+
+    if(msg!=NULL && msgError!=NULL && minSize<maxSize && min<max && reintentos>=0 && input!=NULL)
+    {
+        do
+        {
+            if(!getString(msg,msgError,minSize,maxSize,&reintentos,bufferStr)) //==0 sin errores !0
+            {
+                if(isValidTelephone(bufferStr)==1)
+                {
+                    strncpy(input,bufferStr,maxSize);
+                    retorno=0;
+                    break;
+                }
+                else
+                {
+                    printf("%s 2",msgError);
+                    reintentos--;
+                }
+            }
+        }
+        while(reintentos>=0);
+    }
+    return retorno;
+}
+
+int isValidTelephone(char* stringRecibido)
+{
+    int retorno=1;  // para las funciones isValid arranco con verdadero y cambio cuando encuentro un error
+    int i;
+    for(i=0;stringRecibido[i]!='\0';i++)
+    {
+        if((stringRecibido[i]<'0' || stringRecibido[i]>'9') && (stringRecibido[i]!='-' || stringRecibido[i]!=' '))
+        {
+            retorno=0;
+            break;
+        }
+    }
+    return retorno;
+}
+//***************************************
+int utn_getDNI(char* msg, char* msgError, int minSize, int maxSize, int reintentos, char* input)
+{
+    maxSize=11; //con puntos
+    minSize=8;  // sin puntos
+    int retorno=-1;
+    char bufferStr[maxSize];
+
+    if(msg!=NULL && msgError!=NULL && minSize<maxSize && reintentos>=0 && input!=NULL)
+    {
+        do
+        {
+            if(!getString(msg,msgError,minSize,maxSize,&reintentos,bufferStr)) //==0 sin errores !0
+            {
+                if(isValidDNI(bufferStr)==1)
+                {
+                    strncpy(input,bufferStr,maxSize);
+                    retorno=0;
+                    break;
+                }
+                else
+                {
+                    printf("%s 2",msgError);
+                    reintentos--;
+                }
+            }
+        }
+        while(reintentos>=0);
+    }
+    return retorno;
+}
+
+int isValidDNI(char* stringRecibido)
+{
+    int retorno=1;  // para las funciones isValid arranco con verdadero y cambio cuando encuentro un error
+    int i;
+    for(i=0;stringRecibido[i]!='\0';i++)
+    {
+        if((stringRecibido[i]<'0' || stringRecibido[i]>'9') && (stringRecibido[i]!='.'))
+        {
+            retorno=0;
+            break;
+        }
+    }
+    return retorno;
+}
+
+//***************************************
+int utn_getCUIT(char* msg, char* msgError, int reintentos, char* input)
+{
+    int maxSize=14; //con guiones 13 elementos
+    int minSize=11;  // sin puntos
+    int retorno=-1;
+    char bufferStr[maxSize];
+
+    if(msg!=NULL && msgError!=NULL && minSize<maxSize && reintentos>=0 && input!=NULL)
+    {
+        do
+        {
+            if(!getString(msg,msgError,minSize,maxSize,&reintentos,bufferStr)) //==0 sin errores !0
+            {
+                if(isValidCUIT(bufferStr)==1)
+                {
+                    strncpy(input,bufferStr,maxSize);
+                    retorno=0;
+                    break;
+                }
+                else
+                {
+                    printf("%s 2",msgError);
+                    reintentos--;
+                }
+            }
+        }
+        while(reintentos>=0);
+    }
+    return retorno;
+}
+
+int isValidCUIT(char* stringRecibido)
+{
+    int retorno=1;  // para las funciones isValid arranco con verdadero y cambio cuando encuentro un error
+    int i;
+    int j;
+    char buffer[14];
+    strncpy(buffer,stringRecibido,14);
+
+    for(i=0;buffer[i]!='\0';i++)
+    {
+        if((buffer[i]<'0' || buffer[i]>'9') && (buffer[i]!='-')) // chequeo que solo sean numeros o -
+        {
+            retorno=0;
+            break;
+        }
+
+        if(buffer[i]=='-')  //elimino los -
+        {
+            for(j=i;buffer[j]!='\0';j++)
+            {
+                strncpy(&buffer[j],&buffer[j+1],1);
+            }
+        }
+    }
+
+    int digitos[10]={2,3,4,5,6,7,2,3,4,5};
+    int acumulado = 0;
+    int verificador;
+
+    for(i=0;i < strlen(buffer-1); i++)
+    {
+        acumulado+=buffer[i]*digitos[i];
+    }
+
+    verificador=11-(acumulado%11);
+	if(verificador == 11)
+	{
+		verificador = 0;
+	}
+
+	if(buffer[11]!=verificador)
+    {
+        retorno=0;
+    }
+
+    //if(stringRecibido[2]!='-' || stringRecibido[11]!='-' || stringRecibido[0]!='2' || stringRecibido[1]!='0' || stringRecibido[1]!='3' || stringRecibido[1]!='4' || stringRecibido[1]!='7')
+    return retorno;
+}
+
+//*************************************************************
+int utn_getEmail(char* msg, char* msgError, int minSize, int maxSize, int reintentos, char* input)
+{
+    int retorno=-1;
+    char bufferStr[maxSize];
+
+    if(msg!=NULL && msgError!=NULL && minSize<maxSize && reintentos>=0 && input!=NULL)
+    {
+        do
+        {
+            if(!getString(msg,msgError,minSize,maxSize,&reintentos,bufferStr)) //==0 sin errores !0
+            {
+                if(isValidEmail(bufferStr)==1)
+                {
+                    strncpy(input,bufferStr,maxSize);
+                    retorno=0;
+                    break;
+                }
+                else
+                {
+                    printf("%s 2",msgError);
+                    reintentos--;
+                }
+            }
+        }
+        while(reintentos>=0);
+    }
+    return retorno;
+}
+
+int isValidEmail(char* stringRecibido)
+{
+    int retorno=1;  // para las funciones isValid arranco con verdadero y cambio cuando encuentro un error
+    int i;
+    for(i=0;stringRecibido[i]!='\0';i++)
+    {
+        if((stringRecibido[i]<'-' && stringRecibido[i]!='+') || (stringRecibido[i]>'9' && stringRecibido[i]<'@') ||
+           (stringRecibido[i]>'Z' && stringRecibido[i]!='_' && stringRecibido[i]<'a')|| stringRecibido[i]>'z')
+        {
+            retorno=0;
+            break;
+        }
+    }
+    return retorno;
+}
+
+void AR_CargarVector(int miVector[], int dimension, char *mensaje,
+		char *mensajeError, int minimo, int maximo) {
+	int i;
+	int datos;
+	for (i = 0; i < dimension; i++) {
+		ING_NumeroEnRango(&datos, mensaje, mensajeError, minimo, maximo);
+		miVector[i] = datos;
+	}
+}
+
+void AR_mostrarElementosArray(int miVector[], int dimension, char *mensaje) {
+	int i;
+	printf(mensaje);
+	for (i = 0; i < dimension; i++) {
+		printf(" %d ", miVector[i]);
+	}
+}
+
+int AR_mostrarParesArray(int miVector[], int dimension, char *mensaje) {
+	int i;
+	int respuesta;
+	int retorno;
+
+	retorno = -1;
+
+	printf(mensaje);
+
+	for (i = 0; i < dimension; i++) {
+		respuesta = CAL_esPar(miVector[i]);
+		if (respuesta == 1) {
+			printf(" %d ", miVector[i]);
+			retorno = 0;
+		}
+
+	}
+	return retorno;
+}
+
+int AR_mostrarImparesArray(int miVector[], int dimension, char *mensaje) {
+	int i;
+	int respuesta;
+	int retorno;
+
+	retorno = -1;
+
+	printf(mensaje);
+
+	for (i = 0; i < dimension; i++) {
+		respuesta = CAL_esPar(miVector[i]);
+		if (respuesta == 0) {
+			printf(" %d ", miVector[i]);
+			retorno = 0;
+		}
+
+	}
+	return retorno;
+}
+
+int AR_mostrarPosicionImparesArray(int miVector[], int dimension, char *mensaje) {
+	int i;
+	int respuesta;
+	int retorno;
+
+	retorno=-1;
+
+	printf(mensaje);
+
+	for (i = 0; i < dimension; i++) {
+		respuesta = CAL_esPar(miVector[i]);
+		if (respuesta == 0) {
+			printf(" %d ", i);
+			retorno=0;
+		}
+
+	}
+	return retorno;
+}
+
+void AR_menorAMayorArrayNO(int miVector[], int dimension) {
+	int i;
+	int j;
+	int auxiliar;
+
+	for (i = 0; i < dimension - 1; i++) {
+		for (j = i + 1; j < dimension; j++) {
+			if (miVector[i] > miVector[j]) {
+				auxiliar = miVector[i];
+				miVector[i] = miVector[j];
+				miVector[j] = auxiliar;
+			}
+		}
+	}
+}
+
+void AR_mayorAMenorArrayNO(int miVector[], int dimension) {
+	int i;
+	int j;
+	int auxiliar;
+
+	for (i = 0; i < dimension - 1; i++) {
+		for (j = i + 1; j < dimension; j++) {
+			if (miVector[i] < miVector[j]) {
+				auxiliar = miVector[i];
+				miVector[i] = miVector[j];
+				miVector[j] = auxiliar;
+			}
+		}
+	}
+}
+
+int AR_contadorParesArray(int *pResultado, int miVector[], int dimension) {
+	int i;
+	int pares;
+	int par;
+	int retorno;
+
+	retorno = -2;
+	pares = 0;
+
+	if (pResultado != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			par = CAL_esPar(miVector[i]);
+			if (par == 1) {
+				pares++;
+			}
+		}
+
+		if (pares != 0) {
+			*pResultado = pares;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+
+	return retorno;
+}
+
+int AR_sumarParesArray(int *pResultado, int miVector[], int dimension) {
+	int i;
+	int sumapares;
+	int par;
+	int retorno;
+	int flagIngreso;
+
+	retorno = -2;
+	sumapares = 0;
+	flagIngreso = 0;
+
+	if (pResultado != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			par = CAL_esPar(miVector[i]);
+			if (par == 1) {
+				sumapares += miVector[i];
+				flagIngreso = 1;
+			}
+		}
+
+		if (flagIngreso != 0) {
+			*pResultado = sumapares;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+
+	return retorno;
+}
+int AR_contadorImparesArray(int *pResultado, int miVector[], int dimension) {
+	int i;
+	int impares;
+	int impar;
+	int retorno;
+
+	retorno = -2;
+	impares = 0;
+
+	if (pResultado != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			impar = CAL_esPar(miVector[i]);
+			if (impar == 0) {
+				impares++;
+			}
+		}
+
+		if (impares != 0) {
+			*pResultado = impares;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+
+	return retorno;
+}
+
+int AR_contadorPositivosArray(int *pResultado, int miVector[], int dimension) {
+	int i;
+	int contador;
+	int positivo;
+	int retorno;
+
+	retorno = -2;
+	contador = 0;
+
+	if (pResultado != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			positivo = CAL_esPositivo(miVector[i]);
+			if (positivo == 1) {
+				contador++;
+			}
+		}
+
+		if (contador != 0) {
+			*pResultado = contador;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+	return retorno;
+}
+
+int AR_contadorNegativosArray(int *pResultado, int miVector[], int dimension) {
+	int i;
+	int contador;
+	int negativo;
+	int retorno;
+
+	retorno = -2;
+	contador = 0;
+
+	if (pResultado != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			negativo = CAL_esPositivo(miVector[i]);
+			if (negativo == -1) {
+				contador++;
+			}
+		}
+
+		if (contador != 0) {
+			*pResultado = contador;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+	return retorno;
+}
+
+void AR_mostrarElementosNo0Array(int miVector[], int dimension, char *mensaje) {
+	int i;
+	printf(mensaje);
+	for (i = 0; i < dimension; i++) {
+
+		if (miVector[i] != 0) {
+			printf(" %d ", miVector[i]);
+		}
+	}
+}
+
+void AR_iniciarEn0Array(int miVector[], int dimension) {
+	int i;
+
+	for (i = 0; i < dimension; i++) {
+		miVector[i] = 0;
+	}
+}
+
+void AR_CargarVectorAleatorio(int miVector[], int dimension,
+		char *mensajeVector, char *mensajeErrorVector, int minimoVector,
+		int maximoVector, char *mensajePosicion, char *mensajeErrorPosicion) {
+	int i;
+	int datos;
+	int posicion;
+
+	for (i = 0; i < dimension; i++) {
+		ING_NumeroEnRango(&posicion, mensajePosicion, mensajeErrorPosicion, 0,
+				dimension - 1);
+		ING_NumeroEnRango(&datos, mensajeVector, mensajeErrorVector,
+				minimoVector, maximoVector);
+		miVector[posicion] = datos;
+	}
+}
+
+void AR_CargarVectorAleatorioSinX(int miVector[], int dimension,
+		char *mensajeVector, char *mensajeErrorVector, int minimoVector,
+		int maximoVector, int excluido, char *mensajePosicion,
+		char *mensajeErrorPosicion) {
+	int i;
+	int datos;
+	int posicion;
+
+	for (i = 0; i < dimension; i++) {
+		ING_NumeroEnRango(&posicion, mensajePosicion, mensajeErrorPosicion, 0,
+				dimension - 1);
+		ING_NumeroEnRangoConExcluyente(&datos, mensajeVector,
+				mensajeErrorVector, minimoVector, maximoVector, excluido);
+		miVector[posicion] = datos;
+	}
+}
+
+int AR_promedioPositivosArray(float *pPromedioPositivos, int miVector[],
+		int dimension) {
+	int i;
+	int contadorPositivos;
+	int positividad;
+	float promedio;
+	int acumuladorPositivos;
+	int retorno;
+
+	retorno = -2;
+	acumuladorPositivos = 0;
+	contadorPositivos = 0;
+
+	if (pPromedioPositivos != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			positividad = CAL_esPositivo(miVector[i]);
+			if (positividad == 1) {
+				acumuladorPositivos += miVector[i];
+				contadorPositivos++;
+
+			}
+		}
+		if (contadorPositivos != 0) {
+			promedio = (float) acumuladorPositivos / contadorPositivos;
+			*pPromedioPositivos = promedio;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+
+	}
+	return retorno;
+}
+
+int AR_menorArray(int *pMenor, int miVector[], int dimension) {
+	int minimo;
+	int i;
+	int flagPrimero;
+	int retorno;
+
+	retorno = -1;
+	flagPrimero = 0;
+
+	if (pMenor != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			if (flagPrimero == 0 || miVector[i] < minimo) {
+				minimo = miVector[i];
+				flagPrimero = 1;
+				*pMenor = minimo;
+				retorno = 0;
+			}
+		}
+	}
+
+	return retorno;
+}
+
+int AR_mayorImparArray(int *pMayorImpar, int miVector[], int dimension) {
+	int maximo;
+	int i;
+	int flagPrimero;
+	int retorno;
+	int impar;
+
+	retorno = -2;
+	flagPrimero = 0;
+
+	if (pMayorImpar != NULL && dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			impar = CAL_esPar(miVector[i]);
+			if (impar == 0 && (flagPrimero == 0 || miVector[i] > maximo)) {
+				maximo = miVector[i];
+				flagPrimero = 1;
+			}
+		}
+		if (flagPrimero != 0) {
+			*pMayorImpar = maximo;
+			retorno = 0;
+		} else {
+			retorno = +1;
+		}
+	}
+	return retorno;
+}
+
+int AR_menorNegativosArray(int *pMenorNegativo, int miVector[], int dimension) {
+	int i;
+	int positividad;
+	int minimo;
+	int retorno;
+	int flagPrimero;
+
+	flagPrimero = 0;
+	retorno = -2;
+
+	if (dimension != 0) {
+		for (i = 0; i < dimension; i++) {
+			positividad = CAL_esPositivo(miVector[i]);
+			if (positividad == -1) {
+				if (flagPrimero == 0 || miVector[i] < minimo) {
+					minimo = miVector[i];
+					flagPrimero = 1;
+				}
+			}
+		}
+		if (flagPrimero != 0) {
+			*pMenorNegativo = minimo;
+			retorno = 0;
+		} else {
+			retorno = -1;
+		}
+	}
+
+	return retorno;
+}
+
+int AR_ordenarDecrecienteArray(int miVector[], int dimension) {
+	int retorno;
+	int i;
+	int auxiliar;
+	int flagSwap;
+	int j;
+
+	retorno = -1;
+	j = dimension - 1;
+	
+	if (miVector != NULL && dimension != 0) {		
+		do {
+			flagSwap = 0;
+			for (i = 0; i < j; i++) {
+				if (miVector[i] < miVector[i + 1]) {
+					auxiliar = miVector[i];
+					miVector[i] = miVector[i + 1];
+					miVector[i + 1] = auxiliar;
+					flagSwap = 1;
+				}
+			}
+			j--;
+		} while (flagSwap!=0);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+int AR_ordenarCrecienteArray(int miVector[], int dimension) {
+	int retorno;
+	int i;
+	int auxiliar;
+	int flagSwap;
+	int j;
+
+	retorno = -1;
+	j = dimension - 1;
+	
+	if (miVector != NULL && dimension != 0) {		
+		do {
+			flagSwap = 0;
+			for (i = 0; i < j; i++) {
+				if (miVector[i] < miVector[i + 1]) {
+					auxiliar = miVector[i];
+					miVector[i] = miVector[i + 1];
+					miVector[i + 1] = auxiliar;
+					flagSwap = 1;
+				}
+			}
+			j--;
+		} while (flagSwap!=0);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+int AR_camelCaseCadena(char miCadena[], int dimension)
+{
+	int i;	
+	int retorno;
+	
+	retorno=-1;
+	
+	if (miCadena!=NULL && dimension!=0) {
+		for (i = 0; i < dimension; i++) {
+			if (i == 0) {
+				miCadena[i] = toupper(miCadena[i]);				
+			} else {
+				miCadena[i] = tolower(miCadena[i]);				
+			}
+			if (miCadena[i] == ' ') {
+				i++;
+				miCadena[i] = toupper(miCadena[i]);				
+			}
+		}
+		retorno=0;
+	}
+	return retorno;
+}
+
+int AR_lowerCadena(char miCadena[], int dimension)
+{
+	int i;	
+	int retorno;
+	
+	retorno=-1;
+	
+	if (miCadena!=NULL && dimension!=0) {
+		for (i = 0; i < dimension; i++) {			
+			miCadena[i] = tolower(miCadena[i]);			
+		}
+		retorno=0;
+	}
+	return retorno;
+}
+
+int AR_upperCadena(char miCadena[], int dimension)
+{
+	int i;	
+	int retorno;
+	
+	retorno=-1;
+	
+	if (miCadena!=NULL && dimension!=0) {
+		for (i = 0; i < dimension; i++) {			
+			miCadena[i] = toupper(miCadena[i]);			
+		}
+		retorno=0;
+	}
+	return retorno;
+}
+int AR_esNumerico(char miCadena[]){
+	int i;
+	int retorno;
+	retorno=1;
+	
+	for(i=0;i!='\0';i++){
+		if (miCadena[i]<'0' || miCadena[i>'9']) {
+			retorno=0;
+		}
+	}
+	
+	
+	return retorno;
+}
